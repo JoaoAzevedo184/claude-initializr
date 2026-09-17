@@ -27,7 +27,9 @@ public class GenerationController {
 
 	@PostMapping(value = "/api/generate", produces = "application/zip")
 	public ResponseEntity<byte[]> generate(@Valid @RequestBody GenerateRequest request) {
-		List<GeneratedFile> files = projectGenerator.generate(request.group(), request.artifact(), request.packageName());
+		List<GeneratedFile> files = projectGenerator.generate(
+				request.group(), request.artifact(), request.packageName(),
+				request.bootVersion(), request.javaVersion(), request.buildTool());
 		byte[] zip = projectZipper.zip(files);
 
 		ContentDisposition disposition = ContentDisposition.attachment()

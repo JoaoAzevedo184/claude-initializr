@@ -18,7 +18,16 @@ public record GenerateRequest(
 		@NotBlank
 		@Pattern(regexp = "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*$",
 				message = "deve corresponder a ^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*$")
-		String packageName
+		String packageName,
+
+		@NotBlank
+		String bootVersion,
+
+		@NotBlank
+		String javaVersion,
+
+		@NotBlank
+		String buildTool
 
 ) {
 }
