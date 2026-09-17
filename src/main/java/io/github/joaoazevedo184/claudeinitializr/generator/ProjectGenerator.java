@@ -18,7 +18,8 @@ public class ProjectGenerator {
 		this.templateRenderer = templateRenderer;
 	}
 
-	public List<GeneratedFile> generate(String group, String artifact, String packageName) {
+	public List<GeneratedFile> generate(String group, String artifact, String packageName,
+			String bootVersion, String javaVersion, String buildTool) {
 		String packagePath = packageName.replace('.', '/');
 
 		Map<String, Object> context = Map.of(
@@ -26,9 +27,9 @@ public class ProjectGenerator {
 				"group", group,
 				"packageName", packageName,
 				"packagePath", packagePath,
-				"javaVersion", "21",
-				"bootVersion", "4.1.1",
-				"buildTool", "maven",
+				"javaVersion", javaVersion,
+				"bootVersion", bootVersion,
+				"buildTool", buildTool,
 				"comandoRun", "./mvnw spring-boot:run",
 				"comandoTest", "./mvnw test"
 		);
