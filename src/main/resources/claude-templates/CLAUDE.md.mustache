@@ -1,0 +1,26 @@
+# CLAUDE.md
+
+## Visão geral
+
+**{{artifact}}** é um projeto Java {{javaVersion}} / Spring Boot {{bootVersion}} ({{buildTool}}),
+gerado pelo claude-initializr. Pacote raiz: `{{group}}`, pacote base: `{{packageName}}`.
+
+## Comandos
+
+```bash
+{{comandoRun}}
+{{comandoTest}}
+```
+
+## Estrutura
+
+```
+src/main/java/{{packagePath}}/
+```
+
+## Convenções de código
+
+- Injeção por construtor. `@Autowired` em campo quebra testes e esconde dependência.
+- DTOs de request/response são `record`, nunca classe mutável com getters/setters.
+- Exceções de domínio tratadas num `@RestControllerAdvice` único, não em cada controller.
+- Nomes de classe em inglês; comentários no código em português.
