@@ -25,12 +25,12 @@ Deixar o esqueleto de pé e provar que o Maven está limpo depois da confusão c
 
 O caminho inteiro funcionando com stack fixa. Nada de formulário ainda — só o endpoint.
 
-- [ ] Template `CLAUDE.md.mustache` em `resources/claude-templates/`
-- [ ] `TemplateRenderer` renderizando o template com um contexto simples
-- [ ] `ProjectZipper` montando o zip em memória com `ZipArchiveOutputStream`
-- [ ] `POST /api/generate` devolvendo `application/zip` com um arquivo dentro
-- [ ] Validação de `group`, `artifact` e `packageName` contra regex estrito
-- [ ] Teste garantindo que `../` no artifact é rejeitado
+- [x] Template `CLAUDE.md.mustache` em `resources/claude-templates/`
+- [x] `TemplateRenderer` renderizando o template com um contexto simples
+- [x] `ProjectZipper` montando o zip em memória com `ZipArchiveOutputStream`
+- [x] `POST /api/generate` devolvendo `application/zip` com um arquivo dentro
+- [x] Validação de `group`, `artifact` e `packageName` contra regex estrito
+- [x] Teste garantindo que `../` no artifact é rejeitado
 
 **Pronto quando:** um `curl` com JSON devolve um zip que abre e tem um `CLAUDE.md`
 preenchido com os dados enviados.
