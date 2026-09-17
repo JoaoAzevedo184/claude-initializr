@@ -1,3 +1,36 @@
 spring:
   application:
     name: claude-initializr
+
+claude-initializr:
+  boot-versions:
+    - id: "4.1.1"
+      nome: "4.1.1"
+      padrao: true
+  java-versions:
+    - id: "21"
+      nome: "21"
+      padrao: true
+    - id: "17"
+      nome: "17"
+      padrao: false
+  build-tools:
+    - id: "maven"
+      nome: "Maven"
+      padrao: true
+  componentes:
+    - id: "rules"
+      nome: "rules/"
+      padrao: true
+    - id: "commands"
+      nome: "commands/"
+      padrao: true
+    - id: "agents"
+      nome: "agents/"
+      padrao: false
+    - id: "hooks"
+      nome: "hooks/"
+      padrao: false
+    - id: "mcp"
+      nome: ".mcp.json"
+      padrao: false
