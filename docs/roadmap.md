@@ -41,11 +41,11 @@ preenchido com os dados enviados.
 
 Agora sim a tela, consumindo metadata do servidor em vez de hardcode no HTML.
 
-- [ ] `GET /api/metadata` devolvendo versões de Boot, Java, build tool e componentes
-- [ ] `@ConfigurationProperties` lendo essa metadata do `application.yml`
-- [ ] Página Thymeleaf renderizando os campos a partir da metadata
-- [ ] htmx enviando o form e disparando o download
-- [ ] Layout minimamente apresentável (o Initializr é a referência visual)
+- [x] `GET /api/metadata` devolvendo versões de Boot, Java, build tool e componentes
+- [x] `@ConfigurationProperties` lendo essa metadata do `application.yml`
+- [x] Página Thymeleaf renderizando os campos a partir da metadata
+- [x] Form enviando via fetch/JS e disparando o download (ver nota abaixo)
+- [x] Layout minimamente apresentável (o Initializr é a referência visual)
 
 **Pronto quando:** dá pra gerar o zip sem sair do navegador.
 
