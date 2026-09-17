@@ -1,4 +1,4 @@
-package io.github.joaoazevedo184.claude_initializr;
+package io.github.joaoazevedo184.claudeinitializr;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

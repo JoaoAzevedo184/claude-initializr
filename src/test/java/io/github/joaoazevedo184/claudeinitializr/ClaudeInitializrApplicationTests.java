@@ -1,4 +1,4 @@
-package io.github.joaoazevedo184.claude_initializr;
+package io.github.joaoazevedo184.claudeinitializr;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
