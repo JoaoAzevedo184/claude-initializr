@@ -13,7 +13,9 @@ class ProjectGeneratorTest {
 
 	@Test
 	void generatesClaudeMdWithSubstitutedContext() {
-		List<GeneratedFile> files = generator.generate("com.exemplo", "minha-api", "com.exemplo.minhaapi");
+		List<GeneratedFile> files = generator.generate(
+				"com.exemplo", "minha-api", "com.exemplo.minhaapi",
+				"4.1.1", "17", "maven");
 
 		assertThat(files).hasSize(1);
 		GeneratedFile claudeMd = files.get(0);
@@ -22,6 +24,8 @@ class ProjectGeneratorTest {
 		assertThat(claudeMd.content()).contains("minha-api");
 		assertThat(claudeMd.content()).contains("com.exemplo.minhaapi");
 		assertThat(claudeMd.content()).contains("com/exemplo/minhaapi");
+		assertThat(claudeMd.content()).contains("17");
+		assertThat(claudeMd.content()).contains("4.1.1");
 	}
 
 }

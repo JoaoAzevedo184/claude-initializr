@@ -34,14 +34,14 @@ class GenerationControllerTest {
 
 	@Test
 	void generateReturnsZipForValidRequest() throws Exception {
-		when(projectGenerator.generate(anyString(), anyString(), anyString()))
+		when(projectGenerator.generate(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
 				.thenReturn(List.of(new GeneratedFile("CLAUDE.md", "# CLAUDE.md", 0644)));
 		when(projectZipper.zip(any())).thenReturn(new byte[] {1, 2, 3});
 
 		mockMvc.perform(post("/api/generate")
 						.contentType("application/json")
 						.content("""
-								{"group":"com.exemplo","artifact":"minha-api","packageName":"com.exemplo.minhaapi"}
+								{"group":"com.exemplo","artifact":"minha-api","packageName":"com.exemplo.minhaapi","bootVersion":"4.1.1","javaVersion":"21","buildTool":"maven"}
 								"""))
 				.andExpect(status().isOk())
 				.andExpect(content().contentType("application/zip"))
@@ -53,7 +53,7 @@ class GenerationControllerTest {
 		mockMvc.perform(post("/api/generate")
 						.contentType("application/json")
 						.content("""
-								{"group":"com.exemplo","artifact":"../evil","packageName":"com.exemplo.minhaapi"}
+								{"group":"com.exemplo","artifact":"../evil","packageName":"com.exemplo.minhaapi","bootVersion":"4.1.1","javaVersion":"21","buildTool":"maven"}
 								"""))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.erro").value("VALIDACAO"))
