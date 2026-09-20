@@ -34,14 +34,14 @@ class GenerationControllerTest {
 
 	@Test
 	void generateReturnsZipForValidRequest() throws Exception {
-		when(projectGenerator.generate(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
+		when(projectGenerator.generate(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), any()))
 				.thenReturn(List.of(new GeneratedFile("CLAUDE.md", "# CLAUDE.md", 0644)));
 		when(projectZipper.zip(any())).thenReturn(new byte[] {1, 2, 3});
 
 		mockMvc.perform(post("/api/generate")
 						.contentType("application/json")
 						.content("""
-								{"group":"com.exemplo","artifact":"minha-api","packageName":"com.exemplo.minhaapi","bootVersion":"4.1.1","javaVersion":"21","buildTool":"maven"}
+								{"group":"com.exemplo","artifact":"minha-api","packageName":"com.exemplo.minhaapi","bootVersion":"4.1.1","javaVersion":"21","buildTool":"maven","componentes":["rules","hooks"]}
 								"""))
 				.andExpect(status().isOk())
 				.andExpect(content().contentType("application/zip"))
@@ -58,6 +58,17 @@ class GenerationControllerTest {
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.erro").value("VALIDACAO"))
 				.andExpect(jsonPath("$.campos.artifact").exists());
+	}
+
+	@Test
+	void rejectsUnknownComponent() throws Exception {
+		mockMvc.perform(post("/api/generate")
+						.contentType("application/json")
+						.content("""
+								{"group":"com.exemplo","artifact":"minha-api","packageName":"com.exemplo.minhaapi","bootVersion":"4.1.1","javaVersion":"21","buildTool":"maven","componentes":["../etc"]}
+								"""))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.campos.['componentes[0]']").exists());
 	}
 
 }
