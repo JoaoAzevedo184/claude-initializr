@@ -55,11 +55,11 @@ Agora sim a tela, consumindo metadata do servidor em vez de hardcode no HTML.
 
 Sair de um arquivo só para a árvore completa.
 
-- [ ] Checkboxes: `rules/`, `commands/`, `skills/`, `agents/`, `hooks/`, `.mcp.json`
-- [ ] Um template por componente, com conteúdo real para Spring Boot
-- [ ] `settings.json` e `settings.local.json`
-- [ ] `hooks/validate-bash.sh` saindo com `setUnixMode(0755)`
-- [ ] Teste verificando o bit de execução no arquivo dentro do zip
+- [x] Checkboxes: `rules/`, `commands/`, `skills/`, `agents/`, `hooks/`, `.mcp.json`
+- [x] Um template por componente, com conteúdo real para Spring Boot
+- [x] `settings.json` e `settings.local.json`
+- [x] `hooks/validate-bash.sh` saindo com `setUnixMode(0755)`
+- [x] Teste verificando o bit de execução no arquivo dentro do zip
 
 **Pronto quando:** o zip gerado é um `.claude/` que você usaria de verdade num projeto seu.
 
