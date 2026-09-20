@@ -25,6 +25,9 @@ claude-initializr:
     - id: "commands"
       nome: "commands/"
       padrao: true
+    - id: "skills"
+      nome: "skills/"
+      padrao: false
     - id: "agents"
       nome: "agents/"
       padrao: false
