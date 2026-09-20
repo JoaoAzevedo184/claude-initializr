@@ -1,0 +1,17 @@
+# Testes
+
+Rodar tudo: `{{comandoTest}}`. Um teste só: `./mvnw test -Dtest=NomeDoTest`.
+
+- **Controller:** `@WebMvcTest(MeuController.class)` + `@MockitoBean` para as dependências.
+  No Boot 4 a anotação vive em `org.springframework.boot.webmvc.test.autoconfigure`
+  e `@MockBean` foi removido. Import antigo não compila.
+- **Serviço e regra de negócio:** teste unitário puro com Mockito, sem contexto Spring.
+  Subir contexto para testar `if` é o motivo de a suíte demorar minutos.
+- **`@SpringBootTest`:** um só, smoke test de contexto. Mais que isso, justifique.
+- **Asserções:** AssertJ (`assertThat`), não `assertEquals`. A mensagem de falha é melhor.
+- **Nome descreve comportamento:** `rejeitaArtifactComPathTraversal`, não `testValidate2`.
+- **Nada de `Thread.sleep`.** Espera assíncrona usa Awaitility; tempo usa `Clock` fixo.
+- **Bug corrigido nasce com teste que falha antes da correção.** Rode-o vermelho primeiro,
+  senão você não sabe se ele cobre o bug.
+- **Não altere o teste para passar.** Se o teste falha, decida antes se o erro está no
+  código ou na expectativa, e diga qual dos dois.

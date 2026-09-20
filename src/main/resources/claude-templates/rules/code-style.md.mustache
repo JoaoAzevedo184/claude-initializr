@@ -1,0 +1,20 @@
+# Estilo de código
+
+Complementa o `CLAUDE.md`. Só o que o compilador e o formatter não pegam.
+
+- **Jackson 3 (Spring Boot 4).** `ObjectMapper` vem de `tools.jackson.databind`; as
+  anotações (`@JsonProperty`, `@JsonIgnore`) continuam em `com.fasterxml.jackson.annotation`.
+  Import errado compila com Jackson 2 no classpath e quebra em runtime.
+- **Tempo é dependência.** Injete `java.time.Clock`. `LocalDateTime.now()` dentro de serviço
+  torna o teste dependente do relógio da máquina.
+- **Configuração tipada.** Propriedade nova entra num `@ConfigurationProperties` (record),
+  não em `@Value` espalhado: dá pra validar no boot e o teste instancia o record na mão.
+- **Log parametrizado.** `log.info("pedido {} criado", id)`, nunca concatenação. Nunca logue
+  senha, token, CPF nem corpo de request inteiro.
+- **`Optional` só como retorno.** Nunca como campo, parâmetro ou elemento de coleção.
+- **Sem `catch (Exception)` que engole.** Ou trata com significado ou propaga; o
+  `@RestControllerAdvice` converte em resposta HTTP.
+- **Pacote por feature**, não por camada: `{{packageName}}.pedido` com controller, service e
+  repository juntos. Pacote por camada vira acoplamento cruzado em qualquer projeto médio.
+- **Java {{javaVersion}}:** prefira `record`, `switch` com expressão e `var` só quando o tipo
+  aparece no lado direito.

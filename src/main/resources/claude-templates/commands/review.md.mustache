@@ -1,0 +1,16 @@
+---
+description: Revisa as mudanças não commitadas contra as regras do projeto
+allowed-tools: Bash(git diff:*), Bash(git status:*), Read, Grep
+---
+
+Revise o diff atual (`git diff` e `git diff --staged`).
+
+Confira, nesta ordem:
+
+1. Contradiz algo em `CLAUDE.md` ou `.claude/rules/`? Cite a regra.
+2. Entrada externa usada sem validação (`@Valid`, regex, limite de tamanho)?
+3. Serviço novo ou alterado sem teste correspondente?
+4. Segredo, token ou dado pessoal em código, log ou fixture?
+
+Responda uma linha por achado no formato `arquivo:linha: problema. correção.`
+Se não houver achado, diga isso em uma frase. Não elogie nem resuma o diff.

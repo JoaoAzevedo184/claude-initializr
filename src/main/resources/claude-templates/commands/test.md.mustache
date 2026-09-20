@@ -1,0 +1,15 @@
+---
+description: Roda os testes e investiga falhas
+argument-hint: "[NomeDoTeste]"
+allowed-tools: Bash(./mvnw:*), Read, Grep
+---
+
+Rode `{{comandoTest}}`. Se `$ARGUMENTS` estiver preenchido, rode só esse teste com
+`./mvnw test -Dtest=$ARGUMENTS`.
+
+Se algum teste falhar:
+
+1. Leia o relatório em `target/surefire-reports/` do teste que falhou, não só o resumo do Maven.
+2. Diga se o erro está no código ou na expectativa do teste, com a linha que prova.
+3. Corrija a causa. Não comente, não ignore com `@Disabled` e não afrouxe a asserção para passar.
+4. Rode de novo e reporte o resultado real.

@@ -1,0 +1,20 @@
+---
+name: spring-endpoint
+description: Cria um endpoint REST novo neste projeto (request, controller, serviço, erro e teste). Use quando o pedido for adicionar ou alterar uma rota HTTP.
+---
+
+# Novo endpoint REST
+
+Pacote base: `{{packageName}}` (`src/main/java/{{packagePath}}/`). Siga esta ordem.
+
+1. **Request e response como `record`** no pacote da feature. Bean Validation nos campos
+   do request (`@NotBlank`, `@Size`, `@Pattern`). Nunca devolva entidade nem aceite entidade.
+2. **Controller fino.** Só `@Valid @RequestBody`, chamada ao serviço e montagem da
+   resposta. Regra de negócio no controller é o que mais dá retrabalho depois.
+3. **Serviço** recebe o record ou tipos simples, não `HttpServletRequest`. Injeção por
+   construtor.
+4. **Erro** novo vira exceção de domínio (`RuntimeException`) mapeada no
+   `@RestControllerAdvice` existente. Não crie um segundo advice.
+5. **Teste:** `@WebMvcTest` cobrindo caminho feliz e uma entrada inválida (espere `400`);
+   teste unitário puro do serviço. Veja `.claude/rules/testing.md`.
+6. Rode `{{comandoTest}}` e reporte o resultado real.

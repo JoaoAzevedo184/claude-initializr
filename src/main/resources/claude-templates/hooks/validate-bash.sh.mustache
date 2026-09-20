@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Hook PreToolUse (matcher Bash): bloqueia comandos destrutivos antes de o Claude rodá-los.
+# Exit 2 bloqueia a chamada e devolve o stderr ao modelo. Qualquer outro exit deixa passar.
+# O JSON do hook chega no stdin; casamos direto no texto, sem depender de jq.
+
+input=$(cat)
+
+bloquear() {
+	if grep -Eq "$1" <<<"$input"; then
+		echo "Bloqueado por .claude/hooks/validate-bash.sh: $2" >&2
+		exit 2
+	fi
+}
+
+bloquear 'rm +-(rf|fr) +(/|~|\$HOME)([ "*]|$)' "rm -rf na raiz ou no home"
+bloquear 'git +push.* (--force|-f)([ "]|$)' "push --force (use --force-with-lease)"
+bloquear 'git +reset +--hard' "git reset --hard descarta trabalho não commitado"
+bloquear 'git +commit.*--no-verify' "--no-verify pula os hooks de commit"
+bloquear '(mvn|mvnw) +.*deploy' "deploy publica artefato; rode manualmente"
+bloquear '(curl|wget) .*\| *(sh|bash)' "executar script baixado sem revisar"
+
+exit 0
