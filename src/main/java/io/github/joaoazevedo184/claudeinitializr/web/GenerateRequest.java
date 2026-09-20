@@ -1,7 +1,10 @@
 package io.github.joaoazevedo184.claudeinitializr.web;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+
+import java.util.List;
 
 public record GenerateRequest(
 
@@ -27,7 +30,10 @@ public record GenerateRequest(
 		String javaVersion,
 
 		@NotBlank
-		String buildTool
+		String buildTool,
+
+		List<@NotNull @Pattern(regexp = "^(rules|commands|skills|agents|hooks|mcp)$",
+				message = "componente desconhecido") String> componentes
 
 ) {
 }
