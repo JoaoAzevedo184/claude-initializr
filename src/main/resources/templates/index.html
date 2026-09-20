@@ -9,6 +9,9 @@
 		label { display: block; margin-top: 1rem; font-weight: 600; font-size: 0.9rem; }
 		input, select { width: 100%; padding: 0.4rem; margin-top: 0.25rem; box-sizing: border-box; }
 		button { margin-top: 1.5rem; padding: 0.6rem 1.2rem; cursor: pointer; }
+		fieldset { margin-top: 1rem; }
+		fieldset label { display: flex; gap: 0.5rem; align-items: center; margin-top: 0.25rem; font-weight: normal; }
+		fieldset input { width: auto; margin: 0; }
 		.erro { color: #b00020; margin-top: 1rem; white-space: pre-wrap; }
 	</style>
 </head>
@@ -35,6 +38,10 @@
 		<label for="buildTool">Build tool</label>
 		<select id="buildTool" name="buildTool" required></select>
 
+		<fieldset id="componentes">
+			<legend>Componentes</legend>
+		</fieldset>
+
 		<button type="submit">Gerar .claude/</button>
 	</form>
 
@@ -52,12 +59,26 @@
 			}
 		}
 
+		function preencherComponentes(fieldset, opcoes) {
+			for (const opcao of opcoes) {
+				const label = document.createElement("label");
+				const input = document.createElement("input");
+				input.type = "checkbox";
+				input.name = "componentes";
+				input.value = opcao.id;
+				input.checked = opcao.padrao;
+				label.append(input, opcao.nome);
+				fieldset.appendChild(label);
+			}
+		}
+
 		fetch("/api/metadata")
 			.then(resp => resp.json())
 			.then(metadata => {
 				preencherSelect(document.getElementById("bootVersion"), metadata.bootVersions);
 				preencherSelect(document.getElementById("javaVersion"), metadata.javaVersions);
 				preencherSelect(document.getElementById("buildTool"), metadata.buildTools);
+				preencherComponentes(document.getElementById("componentes"), metadata.componentes);
 			});
 
 		document.getElementById("generate-form").addEventListener("submit", async (event) => {
@@ -72,7 +93,8 @@
 				packageName: form.packageName.value,
 				bootVersion: form.bootVersion.value,
 				javaVersion: form.javaVersion.value,
-				buildTool: form.buildTool.value
+				buildTool: form.buildTool.value,
+				componentes: [...form.querySelectorAll("input[name=componentes]:checked")].map(i => i.value)
 			};
 
 			const response = await fetch("/api/generate", {
