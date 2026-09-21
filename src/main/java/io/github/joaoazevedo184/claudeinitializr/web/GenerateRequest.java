@@ -32,6 +32,9 @@ public record GenerateRequest(
 		@NotBlank
 		String buildTool,
 
+		List<@NotNull @Pattern(regexp = "^(data-jpa|security|data-redis|data-mongodb|kafka)$",
+				message = "dependência desconhecida") String> dependencias,
+
 		List<@NotNull @Pattern(regexp = "^(rules|commands|skills|agents|hooks|mcp)$",
 				message = "componente desconhecido") String> componentes
 

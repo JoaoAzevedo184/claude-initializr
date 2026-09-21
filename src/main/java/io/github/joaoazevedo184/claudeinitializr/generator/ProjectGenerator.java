@@ -4,6 +4,7 @@ import io.github.joaoazevedo184.claudeinitializr.template.TemplateRenderer;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,23 @@ public class ProjectGenerator {
 		COMPONENT_FILES.put("mcp", List.of(".mcp.json"));
 	}
 
+	// id da dependência -> flag do contexto Mustache (usada em CLAUDE.md.mustache).
+	private static final Map<String, String> DEPENDENCY_FLAGS = Map.of(
+			"data-jpa", "temJpa",
+			"security", "temSecurity",
+			"data-redis", "temRedis",
+			"data-mongodb", "temMongo",
+			"kafka", "temKafka");
+
+	// id da dependência -> arquivos extras, gerados só se o componente indicado também foi escolhido.
+	private static final List<DependencyFile> DEPENDENCY_FILES = List.of(
+			new DependencyFile("data-jpa", "rules", ".claude/rules/persistence.md"),
+			new DependencyFile("security", "rules", ".claude/rules/security.md"),
+			new DependencyFile("security", "agents", ".claude/agents/security-auditor.md"));
+
+	private record DependencyFile(String dependency, String component, String path) {
+	}
+
 	private final TemplateRenderer templateRenderer;
 
 	public ProjectGenerator(TemplateRenderer templateRenderer) {
@@ -41,11 +59,12 @@ public class ProjectGenerator {
 	}
 
 	public List<GeneratedFile> generate(String group, String artifact, String packageName,
-			String bootVersion, String javaVersion, String buildTool, List<String> componentes) {
+			String bootVersion, String javaVersion, String buildTool, List<String> dependencias, List<String> componentes) {
+		Set<String> deps = dependencias == null ? Set.of() : Set.copyOf(dependencias);
 		Set<String> escolhidos = componentes == null ? Set.of() : Set.copyOf(componentes);
 		String packagePath = packageName.replace('.', '/');
 
-		Map<String, Object> context = Map.of(
+		Map<String, Object> context = new HashMap<>(Map.of(
 				"artifact", artifact,
 				"group", group,
 				"packageName", packageName,
@@ -56,7 +75,8 @@ public class ProjectGenerator {
 				"comandoRun", "./mvnw spring-boot:run",
 				"comandoTest", "./mvnw test",
 				"temHooks", escolhidos.contains("hooks")
-		);
+		));
+		DEPENDENCY_FLAGS.forEach((id, flag) -> context.put(flag, deps.contains(id)));
 
 		List<GeneratedFile> files = new ArrayList<>();
 		files.add(new GeneratedFile("CLAUDE.md", templateRenderer.render(CLAUDE_MD_TEMPLATE, context), FILE_MODE));
@@ -66,6 +86,9 @@ public class ProjectGenerator {
 				paths.forEach(path -> files.add(render(path, context)));
 			}
 		});
+		DEPENDENCY_FILES.stream()
+				.filter(f -> deps.contains(f.dependency()) && escolhidos.contains(f.component()))
+				.forEach(f -> files.add(render(f.path(), context)));
 		return files;
 	}
 

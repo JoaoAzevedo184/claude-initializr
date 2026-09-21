@@ -29,7 +29,8 @@ public class GenerationController {
 	public ResponseEntity<byte[]> generate(@Valid @RequestBody GenerateRequest request) {
 		List<GeneratedFile> files = projectGenerator.generate(
 				request.group(), request.artifact(), request.packageName(),
-				request.bootVersion(), request.javaVersion(), request.buildTool(), request.componentes());
+				request.bootVersion(), request.javaVersion(), request.buildTool(),
+				request.dependencias(), request.componentes());
 		byte[] zip = projectZipper.zip(files);
 
 		ContentDisposition disposition = ContentDisposition.attachment()
