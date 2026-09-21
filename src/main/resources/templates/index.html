@@ -12,6 +12,17 @@
 		fieldset { margin-top: 1rem; }
 		fieldset label { display: flex; gap: 0.5rem; align-items: center; margin-top: 0.25rem; font-weight: normal; }
 		fieldset input { width: auto; margin: 0; }
+		button.secundario { margin-left: 0.5rem; }
+		dialog { width: min(960px, 95vw); height: 80vh; padding: 0; border: 1px solid #ccc; }
+		dialog[open] { display: flex; flex-direction: column; }
+		.explore-topo { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; border-bottom: 1px solid #ddd; }
+		.explore-topo button { margin: 0; padding: 0.3rem 0.8rem; }
+		.explore-corpo { display: flex; flex: 1; min-height: 0; }
+		.explore-arvore { width: 280px; overflow: auto; padding: 0.5rem; border-right: 1px solid #ddd; font-size: 0.85rem; }
+		.explore-arvore details { margin-left: 0.8rem; }
+		.explore-arvore .arquivo { display: block; margin: 0; padding: 0.1rem 0.3rem; margin-left: 0.8rem; border: 0; background: none; text-align: left; width: 100%; font: inherit; cursor: pointer; }
+		.explore-arvore .arquivo.ativo { background: #e3edff; }
+		.explore-conteudo { flex: 1; margin: 0; padding: 1rem; overflow: auto; font-size: 0.85rem; white-space: pre-wrap; }
 		.erro { color: #b00020; margin-top: 1rem; white-space: pre-wrap; }
 	</style>
 </head>
@@ -47,9 +58,21 @@
 		</fieldset>
 
 		<button type="submit">Gerar .claude/</button>
+		<button type="button" class="secundario" id="explore">Explore</button>
 	</form>
 
 	<div class="erro" id="erro"></div>
+
+	<dialog id="explore-dialog">
+		<div class="explore-topo">
+			<strong id="explore-titulo">Explore</strong>
+			<button type="button" id="explore-fechar">Fechar</button>
+		</div>
+		<div class="explore-corpo">
+			<nav class="explore-arvore" id="explore-arvore"></nav>
+			<pre class="explore-conteudo" id="explore-conteudo"></pre>
+		</div>
+	</dialog>
 
 	<script>
 		function preencherSelect(select, opcoes) {
@@ -87,13 +110,11 @@
 				preencherChecks(document.getElementById("componentes"), "componentes", metadata.componentes);
 			});
 
-		document.getElementById("generate-form").addEventListener("submit", async (event) => {
-			event.preventDefault();
-			const erroEl = document.getElementById("erro");
-			erroEl.textContent = "";
+		const form = document.getElementById("generate-form");
+		const erroEl = document.getElementById("erro");
 
-			const form = event.target;
-			const payload = {
+		function payload() {
+			return {
 				group: form.group.value,
 				artifact: form.artifact.value,
 				packageName: form.packageName.value,
@@ -103,29 +124,100 @@
 				dependencias: [...form.querySelectorAll("input[name=dependencias]:checked")].map(i => i.value),
 				componentes: [...form.querySelectorAll("input[name=componentes]:checked")].map(i => i.value)
 			};
+		}
 
-			const response = await fetch("/api/generate", {
+		// Devolve a response ou null (erro já exibido).
+		async function enviar(url) {
+			erroEl.textContent = "";
+			const response = await fetch(url, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(payload)
+				body: JSON.stringify(payload())
 			});
-
 			if (!response.ok) {
 				const erro = await response.json();
 				erroEl.textContent = erro.mensagem + "\n" + JSON.stringify(erro.campos, null, 2);
-				return;
+				return null;
 			}
+			return response;
+		}
+
+		form.addEventListener("submit", async (event) => {
+			event.preventDefault();
+			const response = await enviar("/api/generate");
+			if (!response) return;
 
 			const blob = await response.blob();
 			const url = URL.createObjectURL(blob);
 			const a = document.createElement("a");
 			a.href = url;
-			a.download = payload.artifact + "-claude.zip";
+			a.download = form.artifact.value + "-claude.zip";
 			document.body.appendChild(a);
 			a.click();
 			a.remove();
 			URL.revokeObjectURL(url);
 		});
+
+		// --- Explore ---
+		const dialog = document.getElementById("explore-dialog");
+		const arvoreEl = document.getElementById("explore-arvore");
+		const conteudoEl = document.getElementById("explore-conteudo");
+
+		function montarArvore(arquivos) {
+			const raiz = {};
+			for (const arquivo of arquivos) {
+				const partes = arquivo.path.split("/");
+				let no = raiz;
+				for (const pasta of partes.slice(0, -1)) no = no[pasta] ??= {};
+				no[partes.at(-1)] = arquivo;
+			}
+			return raiz;
+		}
+
+		function renderizar(no, pai) {
+			const nomes = Object.keys(no).sort((a, b) => {
+				const pastaA = !no[a].path, pastaB = !no[b].path;
+				return pastaA === pastaB ? a.localeCompare(b) : pastaA ? -1 : 1;
+			});
+			for (const nome of nomes) {
+				const filho = no[nome];
+				if (filho.path) {
+					const botao = document.createElement("button");
+					botao.type = "button";
+					botao.className = "arquivo";
+					botao.textContent = nome;
+					botao.addEventListener("click", () => {
+						arvoreEl.querySelectorAll(".ativo").forEach(el => el.classList.remove("ativo"));
+						botao.classList.add("ativo");
+						conteudoEl.textContent = filho.content;
+					});
+					pai.appendChild(botao);
+				} else {
+					const details = document.createElement("details");
+					details.open = true;
+					const summary = document.createElement("summary");
+					summary.textContent = nome + "/";
+					details.appendChild(summary);
+					renderizar(filho, details);
+					pai.appendChild(details);
+				}
+			}
+		}
+
+		document.getElementById("explore").addEventListener("click", async () => {
+			if (!form.reportValidity()) return;
+			const response = await enviar("/api/preview");
+			if (!response) return;
+
+			const { arquivos } = await response.json();
+			arvoreEl.innerHTML = "";
+			conteudoEl.textContent = "";
+			renderizar(montarArvore(arquivos), arvoreEl);
+			[...arvoreEl.querySelectorAll(".arquivo")].find(b => b.textContent === "CLAUDE.md")?.click();
+			dialog.showModal();
+		});
+
+		document.getElementById("explore-fechar").addEventListener("click", () => dialog.close());
 	</script>
 </body>
 </html>
