@@ -27,11 +27,7 @@ public class GenerationController {
 
 	@PostMapping(value = "/api/generate", produces = "application/zip")
 	public ResponseEntity<byte[]> generate(@Valid @RequestBody GenerateRequest request) {
-		List<GeneratedFile> files = projectGenerator.generate(
-				request.group(), request.artifact(), request.packageName(),
-				request.bootVersion(), request.javaVersion(), request.buildTool(),
-				request.dependencias(), request.componentes());
-		byte[] zip = projectZipper.zip(files);
+		byte[] zip = projectZipper.zip(files(request));
 
 		ContentDisposition disposition = ContentDisposition.attachment()
 				.filename(request.artifact() + "-claude.zip")
@@ -41,6 +37,19 @@ public class GenerationController {
 				.contentType(MediaType.valueOf("application/zip"))
 				.header(HttpHeaders.CONTENT_DISPOSITION, disposition.toString())
 				.body(zip);
+	}
+
+	@PostMapping("/api/preview")
+	public PreviewResponse preview(@Valid @RequestBody GenerateRequest request) {
+		return new PreviewResponse(files(request));
+	}
+
+	// generate e preview compartilham a geração; só o formato de saída muda.
+	private List<GeneratedFile> files(GenerateRequest request) {
+		return projectGenerator.generate(
+				request.group(), request.artifact(), request.packageName(),
+				request.bootVersion(), request.javaVersion(), request.buildTool(),
+				request.dependencias(), request.componentes());
 	}
 
 }
