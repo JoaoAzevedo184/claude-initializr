@@ -82,4 +82,33 @@ class GenerationControllerTest {
 				.andExpect(jsonPath("$.campos.['dependencias[0]']").exists());
 	}
 
+	@Test
+	void previewReturnsTreeWithContentAsJson() throws Exception {
+		when(projectGenerator.generate(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), any(), any()))
+				.thenReturn(List.of(
+						new GeneratedFile("CLAUDE.md", "# CLAUDE.md", 0644),
+						new GeneratedFile(".claude/hooks/validate-bash.sh", "#!/bin/bash", 0755)));
+
+		mockMvc.perform(post("/api/preview")
+						.contentType("application/json")
+						.content("""
+								{"group":"com.exemplo","artifact":"minha-api","packageName":"com.exemplo.minhaapi","bootVersion":"4.1.1","javaVersion":"21","buildTool":"maven","componentes":["hooks"]}
+								"""))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.arquivos[0].path").value("CLAUDE.md"))
+				.andExpect(jsonPath("$.arquivos[0].content").value("# CLAUDE.md"))
+				.andExpect(jsonPath("$.arquivos[1].path").value(".claude/hooks/validate-bash.sh"));
+	}
+
+	@Test
+	void previewRejectsPathTraversalInArtifact() throws Exception {
+		mockMvc.perform(post("/api/preview")
+						.contentType("application/json")
+						.content("""
+								{"group":"com.exemplo","artifact":"../evil","packageName":"com.exemplo.minhaapi","bootVersion":"4.1.1","javaVersion":"21","buildTool":"maven"}
+								"""))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.campos.artifact").exists());
+	}
+
 }
