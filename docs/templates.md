@@ -51,7 +51,7 @@ Flags de dependência viram seções condicionais:
 {{/temJpa}}
 ```
 
-Disponíveis: `temJpa`, `temSecurity`, `temRedis`, `temMongo`, `temKafka`, `temWeb`.
+Disponíveis: `temJpa`, `temSecurity`, `temRedis`, `temMongo`, `temKafka`, `temHooks`.
 
 ## Como escrever uma regra boa
 
@@ -93,10 +93,11 @@ carregado sob demanda em vez de sempre.
 ## Adicionando uma dependência nova
 
 1. Cadastre em `application.yml`, na lista `dependencias`
-2. Crie a flag correspondente na montagem do contexto (`temXpto`)
+2. Crie a flag correspondente em `DEPENDENCY_FLAGS` no `ProjectGenerator` (`temXpto`) e o
+   id em `GenerateRequest.dependencias`
 3. Escreva o bloco condicional no `CLAUDE.md.mustache`
 4. Se o assunto render mais de ~15 linhas, crie `rules/xpto.md.mustache` em vez de inchar
-   o `CLAUDE.md`
+   o `CLAUDE.md`, e registre-o em `DEPENDENCY_FILES` (só sai se o componente `rules` estiver marcado)
 5. Adicione um teste comparando a geração com e sem a dependência
 
 O passo 5 não é burocracia: sem ele, dá pra cadastrar uma dependência que aparece bonita

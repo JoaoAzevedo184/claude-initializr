@@ -69,11 +69,11 @@ Sair de um arquivo só para a árvore completa.
 
 É aqui que o projeto deixa de ser um gerador de pasta vazia. Prioridade máxima depois da Fase 3.
 
-- [ ] Mapeamento dependência → fragmentos de regra
-- [ ] JPA: N+1, `@Transactional`, DTO em vez de entidade no controller
-- [ ] Security: `agents/security-auditor.md` e regras de authz
-- [ ] Redis / Mongo / Kafka: pelo menos um bloco específico cada
-- [ ] Os fragmentos entram no `CLAUDE.md` gerado **e** em `rules/*.md`
+- [x] Mapeamento dependência → fragmentos de regra
+- [x] JPA: N+1, `@Transactional`, DTO em vez de entidade no controller
+- [x] Security: `agents/security-auditor.md` e regras de authz
+- [x] Redis / Mongo / Kafka: pelo menos um bloco específico cada
+- [x] Os fragmentos entram no `CLAUDE.md` gerado **e** em `rules/*.md`
 
 **Pronto quando:** gerar com JPA e sem JPA produz `CLAUDE.md` visivelmente diferentes.
 
