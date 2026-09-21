@@ -83,9 +83,9 @@ Sair de um arquivo só para a árvore completa.
 
 O botão que vende o produto em demo.
 
-- [ ] `POST /api/preview` devolvendo a árvore + conteúdo em JSON
-- [ ] Modal com árvore navegável e o arquivo selecionado ao lado
-- [ ] `generate` e `preview` compartilhando a mesma geração
+- [x] `POST /api/preview` devolvendo a árvore + conteúdo em JSON
+- [x] Modal com árvore navegável e o arquivo selecionado ao lado
+- [x] `generate` e `preview` compartilhando a mesma geração
 
 **Pronto quando:** dá pra inspecionar tudo antes de baixar.
 

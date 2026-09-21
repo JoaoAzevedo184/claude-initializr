@@ -97,21 +97,21 @@ Mesmo request do `generate`, mesma geração — só o formato muda. Alimenta o 
 {
   "arquivos": [
     {
-      "caminho": "CLAUDE.md",
-      "conteudo": "# CLAUDE.md\n\n## Visao geral\n...",
-      "modoUnix": "644"
+      "path": "CLAUDE.md",
+      "content": "# CLAUDE.md\n\n## Visao geral\n...",
+      "unixMode": 420
     },
     {
-      "caminho": ".claude/hooks/validate-bash.sh",
-      "conteudo": "#!/usr/bin/env bash\n...",
-      "modoUnix": "755"
+      "path": ".claude/hooks/validate-bash.sh",
+      "content": "#!/usr/bin/env bash\n...",
+      "unixMode": 493
     }
   ]
 }
 ```
 
-A ordem dos arquivos é a de caminhamento da árvore, já pronta pro front renderizar sem
-reordenar.
+`unixMode` é o inteiro decimal do modo (420 = `0644`, 493 = `0755`). A lista é plana, na
+ordem de geração; o front monta a árvore a partir de `path` e ordena pastas antes de arquivos.
 
 ---
 
