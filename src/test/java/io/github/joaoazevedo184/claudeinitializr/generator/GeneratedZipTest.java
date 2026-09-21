@@ -18,7 +18,7 @@ class GeneratedZipTest {
 	void hookScriptIsExecutableInsideZipAndOtherFilesAreNot() throws IOException {
 		List<GeneratedFile> files = new ProjectGenerator(new TemplateRenderer()).generate(
 				"com.exemplo", "minha-api", "com.exemplo.minhaapi",
-				"4.1.1", "21", "maven", List.of("rules", "hooks", "mcp"));
+				"4.1.1", "21", "maven", null, List.of("rules", "hooks", "mcp"));
 
 		byte[] zipBytes = new ProjectZipper().zip(files);
 

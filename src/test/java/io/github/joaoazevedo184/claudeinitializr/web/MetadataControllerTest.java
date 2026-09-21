@@ -1,6 +1,7 @@
 package io.github.joaoazevedo184.claudeinitializr.web;
 
 import io.github.joaoazevedo184.claudeinitializr.config.MetadataProperties;
+import io.github.joaoazevedo184.claudeinitializr.metadata.DependencyOption;
 import io.github.joaoazevedo184.claudeinitializr.metadata.MetadataOption;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,8 @@ class MetadataControllerTest {
 						new MetadataOption("17", "17", false)));
 		when(metadataProperties.buildTools())
 				.thenReturn(List.of(new MetadataOption("maven", "Maven", true)));
+		when(metadataProperties.dependencias())
+				.thenReturn(List.of(new DependencyOption("data-jpa", "Spring Data JPA", "SQL", "desc")));
 		when(metadataProperties.componentes())
 				.thenReturn(List.of(new MetadataOption("rules", "rules/", true)));
 
@@ -43,6 +46,7 @@ class MetadataControllerTest {
 				.andExpect(jsonPath("$.javaVersions[0].padrao").value(true))
 				.andExpect(jsonPath("$.javaVersions[1].id").value("17"))
 				.andExpect(jsonPath("$.buildTools[0].id").value("maven"))
+				.andExpect(jsonPath("$.dependencias[0].id").value("data-jpa"))
 				.andExpect(jsonPath("$.componentes[0].id").value("rules"));
 	}
 
