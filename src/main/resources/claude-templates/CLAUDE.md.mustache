@@ -24,3 +24,51 @@ src/main/java/{{packagePath}}/
 - DTOs de request/response são `record`, nunca classe mutável com getters/setters.
 - Exceções de domínio tratadas num `@RestControllerAdvice` único, não em cada controller.
 - Nomes de classe em inglês; comentários no código em português.
+{{#temJpa}}
+
+## Persistência (JPA)
+
+- Controller nunca devolve nem recebe entidade JPA: mapeie para `record` dentro do serviço.
+- Todo acesso a coleção lazy em loop é N+1: use `join fetch` ou `@EntityGraph` na query.
+- `@Transactional` só em método público de serviço. Chamada interna (`this.metodo()`) não
+  passa pelo proxy e a anotação não tem efeito.
+- Verificar-e-gravar em Java não é atômico: use `@Version`, lock pessimista ou `UNIQUE` no banco.
+- Teste de repositório com Testcontainers do banco real, nunca H2.
+{{/temJpa}}
+{{#temSecurity}}
+
+## Segurança
+
+- Autorização no serviço (`@PreAuthorize`), não só em `requestMatchers`.
+- Todo acesso a recurso por id confere o dono na própria query (`findByIdAndOwnerId`).
+- `SecurityFilterChain` termina em `.anyRequest().authenticated()`.
+- Nunca em log: senha, token, header `Authorization`, dado pessoal.
+- Segredo só por variável de ambiente; nunca em `application.yml` versionado.
+{{/temSecurity}}
+{{#temRedis}}
+
+## Redis
+
+- Toda chave tem TTL. Chave sem expiração vira vazamento de memória.
+- Nome de chave `app:entidade:id`. Nunca `KEYS *` em código de aplicação: use `SCAN`.
+- `@Cacheable` sofre do mesmo limite do proxy que `@Transactional`: chamada interna não cacheia.
+- Valor cacheado é versionado ou tolerante a campo novo; deploy com cache antigo não pode quebrar.
+{{/temRedis}}
+{{#temMongo}}
+
+## MongoDB
+
+- Documento tem limite de 16MB: array que cresce sem teto vira problema. Modele como coleção própria.
+- O Spring Data não cria índice sozinho (`auto-index-creation` é `false`): declare-os em migração.
+- Transação multi-documento exige replica set. Sem ele, projete para operação atômica em um documento.
+- Teste com Testcontainers Mongo, não com mock do template.
+{{/temMongo}}
+{{#temKafka}}
+
+## Kafka
+
+- Entrega é at-least-once: consumidor idempotente, ou duplicata vira efeito duplicado.
+- Chave da mensagem = id do agregado; sem chave não há ordem por entidade.
+- Gravar no banco e publicar na fila são duas operações: use outbox, não `@Transactional` esperando atomicidade.
+- Falha de processamento vai para retry com backoff e depois DLT. Nunca `catch` que descarta a mensagem.
+{{/temKafka}}

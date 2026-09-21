@@ -1,0 +1,30 @@
+# Persistência (Spring Data JPA)
+
+- **N+1.** Loop que acessa associação lazy dispara uma query por linha. Resolva na query:
+  `join fetch` ou `@EntityGraph`. `FetchType.EAGER` não é correção: ele só esconde o N+1
+  em toda consulta, inclusive nas que não precisam da associação.
+- **Paginação com `join fetch` em coleção.** O Hibernate pagina em memória (aviso `HHH90003004`)
+  e carrega a tabela inteira. Busque a página de ids primeiro, ou use `@BatchSize`.
+- **`spring.jpa.open-in-view=false`.** O padrão é `true` e mantém a conexão presa até o fim
+  do request. Com `false`, `LazyInitializationException` no controller significa que o
+  serviço devolveu entidade: monte o DTO dentro do serviço.
+- **`@Transactional` só em método público de serviço.** Chamada interna (`this.outro()`)
+  não passa pelo proxy e a anotação vira decoração; em método privado é ignorada.
+  Nunca em controller.
+- **Rollback.** Exceção checked não faz rollback por padrão: use `rollbackFor`. Consulta
+  usa `@Transactional(readOnly = true)`.
+- **Sem chamada remota dentro da transação** (HTTP, publicar em fila). Ela segura a conexão
+  do pool durante a espera e, se a transação der rollback, o efeito externo já aconteceu.
+- **Entidade não sai do serviço.** Controller recebe e devolve `record`. Entidade na
+  resposta vaza coluna nova sem ninguém decidir e quebra com lazy; entidade na entrada
+  permite mass assignment.
+- **Entidade:** sem `@Data`/`@EqualsAndHashCode` de Lombok (o `toString` percorre associação
+  lazy). `equals`/`hashCode` pela chave de negócio ou pelo id, nunca por todos os campos.
+- **Concorrência.** "Verifica e depois grava" em Java não é atômico (overbooking, saldo
+  negativo). Use `@Version` (lock otimista, trate `OptimisticLockingFailureException`),
+  `@Lock(PESSIMISTIC_WRITE)` ou constraint `UNIQUE` no banco. A constraint é a única
+  garantia que sobrevive a duas instâncias da aplicação.
+- **Schema.** `ddl-auto` fica em `validate` (ou `none`) com Flyway ou Liquibase. `update`
+  e `create` só em teste descartável.
+- **Teste de repositório usa Testcontainers com o mesmo banco de produção, não H2.**
+  Dialeto diferente esconde bug de SQL, de tipo e de lock.

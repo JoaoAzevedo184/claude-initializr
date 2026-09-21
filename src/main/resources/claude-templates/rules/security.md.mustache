@@ -1,0 +1,29 @@
+# Segurança (Spring Security)
+
+- **Autorização no serviço, não só na URL.** `@PreAuthorize` com `@EnableMethodSecurity`.
+  Regra só em `requestMatchers` deixa aberto qualquer outro caminho que chame o serviço
+  (job, listener, outro controller).
+- **Posse do recurso (IDOR).** `repository.findByIdAndOwnerId(id, userId)`, não `findById`
+  seguido de comparação no controller. Recurso alheio responde `404`, não `403`, para não
+  confirmar que o id existe.
+- **Negar por padrão.** O `SecurityFilterChain` termina em `.anyRequest().authenticated()`.
+  O primeiro matcher que casa vence, então o mais específico vem antes.
+- **`SecurityFilterChain` é um `@Bean`.** `WebSecurityConfigurerAdapter` não existe mais.
+- **CSRF.** Desligue só em API stateless com token no header, e diga isso num comentário.
+  Com sessão ou cookie, desligar abre a API a requisição forjada.
+- **Senha.** `PasswordEncoder` do `DelegatingPasswordEncoder` (bcrypt). Nunca `equals`
+  em senha, nunca campo de senha em DTO de resposta, nunca no log.
+- **Nunca vai para log:** header `Authorization`, token, senha, CPF/e-mail, corpo de
+  request inteiro.
+- **Login com falha** responde a mesma mensagem para usuário inexistente e senha errada.
+- **Validação na borda.** `@Valid` em todo `@RequestBody`. Bind direto em entidade é mass
+  assignment (`"role":"ADMIN"` no JSON).
+- **Erros sem detalhe.** `server.error.include-stacktrace=never` e `include-message=never`.
+  Stack trace na resposta é mapa do sistema para o atacante.
+- **Segredo por variável de ambiente.** Chave JWT, senha de banco e API key nunca em
+  `application.yml` versionado.
+- **CORS** com lista explícita de origens. `*` com credenciais é recusado pelo navegador
+  e, "corrigido" com `allowedOriginPatterns("*")`, vira abertura total.
+- **Actuator** expõe só `health` e `info` (`management.endpoints.web.exposure.include`).
+- **Teste os dois lados:** `401` sem credencial e `403` com papel errado, além do caminho
+  feliz. `@WithMockUser` cobre o papel; a posse do recurso precisa de teste próprio.
